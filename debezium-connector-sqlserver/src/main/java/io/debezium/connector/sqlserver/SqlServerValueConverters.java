@@ -8,6 +8,7 @@ package io.debezium.connector.sqlserver;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 
 import org.apache.kafka.connect.data.Field;
@@ -50,7 +51,26 @@ public class SqlServerValueConverters extends JdbcValueConverters {
      */
     public SqlServerValueConverters(DecimalMode decimalMode, TemporalPrecisionMode temporalPrecisionMode,
                                     CommonConnectorConfig.BinaryHandlingMode binaryMode) {
-        super(decimalMode, temporalPrecisionMode, ZoneOffset.UTC, null, null, binaryMode);
+        this(decimalMode, temporalPrecisionMode, binaryMode, ZoneOffset.UTC);
+    }
+
+    /**
+     * Create a new instance that always uses UTC for the default time zone when
+     * converting values without timezone information to values that require
+     * timezones.
+     * <p>
+     *
+     * @param decimalMode
+     *            how {@code DECIMAL} and {@code NUMERIC} values should be
+     *            treated; may be null if
+     *            {@link io.debezium.jdbc.JdbcValueConverters.DecimalMode#PRECISE}
+     *            is to be used
+     * @param temporalPrecisionMode
+     *            date/time value will be represented either as Connect datatypes or Debezium specific datatypes
+     */
+    public SqlServerValueConverters(DecimalMode decimalMode, TemporalPrecisionMode temporalPrecisionMode,
+                                    CommonConnectorConfig.BinaryHandlingMode binaryMode, ZoneId zoneId) {
+        super(decimalMode, temporalPrecisionMode, ZoneOffset.UTC, null, null, binaryMode, zoneId);
     }
 
     @Override

@@ -7,6 +7,8 @@ package io.debezium.time;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.temporal.TemporalAdjuster;
 
 import org.apache.kafka.connect.data.Schema;
@@ -70,6 +72,27 @@ public class NanoTimestamp {
         if (adjuster != null) {
             dateTime = dateTime.with(adjuster);
         }
+        return toEpochNanos(dateTime);
+    }
+
+    /**
+     * Get the number of nanoseconds past epoch of the given {@link java.time.LocalDateTime}, {@link java.time.LocalDate},
+     * {@link java.time.LocalTime}, {@link java.util.Date}, {@link java.sql.Date}, {@link java.sql.Time}, or
+     * {@link java.sql.Timestamp}.
+     *
+     * @param value the local or SQL date, time, or timestamp value; may not be null
+     * @param adjuster the optional component that adjusts the local date value before obtaining the epoch day; may be null if no
+     * adjustment is necessary
+     * @param zoneId database timezone
+     * @return the epoch nanoseconds
+     * @throws IllegalArgumentException if the value is not an instance of the acceptable types
+     */
+    public static long toEpochNanos(Object value, TemporalAdjuster adjuster, ZoneId zoneId) {
+        LocalDateTime dateTime = Conversions.toLocalDateTime(value);
+        if (adjuster != null) {
+            dateTime = dateTime.with(adjuster);
+        }
+        dateTime = dateTime.atZone(zoneId).withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
         return toEpochNanos(dateTime);
     }
 

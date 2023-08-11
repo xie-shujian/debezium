@@ -539,7 +539,7 @@ public class JdbcValueConverters implements ValueConverterProvider {
         // epoch is the fallback value
         return convertValue(column, fieldDefn, data, 0L, (r) -> {
             try {
-                r.deliver(NanoTimestamp.toEpochNanos(data, adjuster));
+                r.deliver(NanoTimestamp.toEpochNanos(data, adjuster, zoneId));
             }
             catch (IllegalArgumentException e) {
             }

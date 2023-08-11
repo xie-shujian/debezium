@@ -5,6 +5,8 @@
  */
 package io.debezium.relational;
 
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -42,7 +44,8 @@ public abstract class HistorizedRelationalDatabaseConnectorConfig extends Relati
     protected boolean skipUnparseableDDL;
     protected boolean storeOnlyCapturedTablesDdl;
     protected boolean storeOnlyCapturedDatabasesDdl;
-
+    public static final String DATABASE_TIME_ZONE = "database.timezone";
+    private final ZoneId zoneId;
     /**
      * The database schema history class is hidden in the {@link #configDef()} since that is designed to work with a user interface,
      * and in these situations using Kafka is the only way to go.
@@ -110,6 +113,14 @@ public abstract class HistorizedRelationalDatabaseConnectorConfig extends Relati
         this.skipUnparseableDDL = config.getBoolean(SKIP_UNPARSEABLE_DDL_STATEMENTS);
         this.storeOnlyCapturedTablesDdl = config.getBoolean(STORE_ONLY_CAPTURED_TABLES_DDL);
         this.storeOnlyCapturedDatabasesDdl = config.getBoolean(STORE_ONLY_CAPTURED_DATABASES_DDL);
+
+        //database timezone
+        String databaseTimeZone = config.getString(DATABASE_TIME_ZONE );
+        if (databaseTimeZone != null) {
+            this.zoneId= ZoneId.of(databaseTimeZone);
+        }else{
+            this.zoneId = ZoneOffset.UTC;
+        }
     }
 
     /**
@@ -177,4 +188,7 @@ public abstract class HistorizedRelationalDatabaseConnectorConfig extends Relati
      */
     protected abstract HistoryRecordComparator getHistoryRecordComparator();
 
+    public ZoneId getZoneId() {
+        return zoneId;
+    }
 }
